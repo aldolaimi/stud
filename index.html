@@ -763,21 +763,17 @@
                 <h3><i class="fa-solid fa-users-gear" style="color:var(--leather)"></i> إدارة المستخدمين</h3>
                 <div class="mgmt-desc">إضافة مستخدم جديد إلى النظام. يمكن تعيين صلاحية مدير (تحكم كامل) أو مشاهد (اطلاع فقط).</div>
                 <form onsubmit="executeAddUser(event)" style="display:flex;flex-direction:column;gap:10px;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                        <input type="text" id="newUserUsername" placeholder="اسم المستخدم" required
-                            style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;">
-                        <input type="password" id="newUserPassword" placeholder="كلمة المرور" required
-                            style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;">
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                        <input type="email" id="newUserEmail" placeholder="البريد الإلكتروني" required
-                            style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;">
-                        <select id="newUserRole" required
-                            style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;background:white;color:var(--ink);">
-                            <option value="viewer">مشاهد فقط</option>
-                            <option value="manager">مدير (تحكم كامل)</option>
-                        </select>
-                    </div>
+                    <input type="text" id="newUserUsername" placeholder="اسم المستخدم" required
+                        style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;">
+                    <input type="password" id="newUserPassword" placeholder="كلمة المرور" required
+                        style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;">
+                    <input type="email" id="newUserEmail" placeholder="البريد الإلكتروني" required
+                        style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;">
+                    <select id="newUserRole" required
+                        style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;background:white;color:var(--ink);">
+                        <option value="viewer">مشاهد فقط</option>
+                        <option value="manager">مدير (تحكم كامل)</option>
+                    </select>
                     <button type="submit" class="btn btn-submit" style="margin-top:0;padding:11px;">
                         <i class="fa-solid fa-user-plus"></i> إضافة مستخدم جديد
                     </button>
