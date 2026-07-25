@@ -758,6 +758,36 @@
                 </div>
                 <input type="file" id="backupFileInput" accept="application/json" class="hidden" onchange="importBackup(event)">
             </div>
+
+            <div class="mgmt-card" id="userManagementCard">
+                <h3><i class="fa-solid fa-users-gear" style="color:var(--leather)"></i> إدارة المستخدمين</h3>
+                <div class="mgmt-desc">إضافة مستخدم جديد إلى النظام. يمكن تعيين صلاحية مدير (تحكم كامل) أو مشاهد (اطلاع فقط).</div>
+                <form onsubmit="executeAddUser(event)" style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <input type="text" id="newUserUsername" placeholder="اسم المستخدم" required
+                            style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;">
+                        <input type="password" id="newUserPassword" placeholder="كلمة المرور" required
+                            style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;">
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <input type="email" id="newUserEmail" placeholder="البريد الإلكتروني" required
+                            style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;">
+                        <select id="newUserRole" required
+                            style="padding:10px;border:1.5px solid #E2D6B8;border-radius:8px;font-family:'Almarai',sans-serif;font-size:0.88rem;background:white;color:var(--ink);">
+                            <option value="viewer">مشاهد فقط</option>
+                            <option value="manager">مدير (تحكم كامل)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-submit" style="margin-top:0;padding:11px;">
+                        <i class="fa-solid fa-user-plus"></i> إضافة مستخدم جديد
+                    </button>
+                </form>
+                <div id="userAddFeedback" class="hidden" style="margin-top:10px;padding:9px 12px;border-radius:8px;font-size:0.8rem;font-weight:700;"></div>
+                <div style="margin-top:14px;">
+                    <div style="font-size:0.75rem;font-weight:700;color:var(--ink);opacity:0.6;margin-bottom:8px;">المستخدمون الحاليون:</div>
+                    <div id="existingUsersList" style="display:flex;flex-direction:column;gap:6px;font-size:0.82rem;"></div>
+                </div>
+            </div>
         </div>
 
         <div id="panel-all" class="view-panel">
@@ -1050,6 +1080,7 @@
                 section.classList.remove('hidden');
                 btn.classList.add('open');
                 btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i> إخفاء الملخص المالي وتقارير الإدارة';
+                if (isManager) fetchUsers();
             } else {
                 section.classList.add('hidden');
                 btn.classList.remove('open');
@@ -1513,6 +1544,64 @@
                 } catch (e) {
                     alert('تعذر حذف العميل: ' + e.message);
                 }
+            }
+        }
+
+        // ── User management ──────────────────────────────────────────
+        async function fetchUsers() {
+            const res = await api('/api/users');
+            if (!res || !res.ok) return;
+            const users = await res.json();
+            const listEl = document.getElementById('existingUsersList');
+            if (!listEl) return;
+            listEl.innerHTML = users.map(u => `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#F7F0DE;border-radius:7px;border:1px solid #E9DCC0;">
+                    <span><b>${u.username}</b> <span style="opacity:0.55;font-size:0.72rem;">${u.email}</span></span>
+                    <span style="font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:5px;${u.role === 'manager' ? 'background:var(--hunter-light);color:var(--hunter);' : 'background:#EDE3CB;color:var(--ink);opacity:0.7;'}">
+                        ${u.role === 'manager' ? 'مدير' : 'مشاهد'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        async function executeAddUser(event) {
+            event.preventDefault();
+            if (!requireManager()) return;
+            const username = document.getElementById('newUserUsername').value.trim();
+            const password = document.getElementById('newUserPassword').value;
+            const email = document.getElementById('newUserEmail').value.trim();
+            const role = document.getElementById('newUserRole').value;
+            const feedback = document.getElementById('userAddFeedback');
+
+            try {
+                const res = await api('/api/users', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password, role, email })
+                });
+                const data = await res.json();
+                if (!res || !res.ok) {
+                    feedback.className = '';
+                    feedback.style.background = 'var(--oxblood-light)';
+                    feedback.style.color = 'var(--oxblood)';
+                    feedback.innerText = '❌ ' + (data.error || 'فشلت الإضافة');
+                    feedback.classList.remove('hidden');
+                    return;
+                }
+                feedback.className = '';
+                feedback.style.background = 'var(--hunter-light)';
+                feedback.style.color = 'var(--hunter)';
+                feedback.innerText = `✅ تم إضافة المستخدم "${data.username}" بنجاح`;
+                feedback.classList.remove('hidden');
+                document.getElementById('newUserUsername').value = '';
+                document.getElementById('newUserPassword').value = '';
+                document.getElementById('newUserEmail').value = '';
+                await fetchUsers();
+            } catch (e) {
+                feedback.className = '';
+                feedback.style.background = 'var(--oxblood-light)';
+                feedback.style.color = 'var(--oxblood)';
+                feedback.innerText = '❌ تعذر إضافة المستخدم';
+                feedback.classList.remove('hidden');
             }
         }
 

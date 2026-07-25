@@ -355,6 +355,44 @@ async function handleAPI(req: Request): Promise<Response> {
     return jsonResponse(rows);
   }
 
+  // ── GET /api/users ────────────────────────────────────────────
+  if (path === "/api/users" && method === "GET") {
+    const session = requireManager(req);
+    if (!session) return errorResponse("هذا الإجراء متاح للمدراء فقط", 403);
+    const rows = db.query("SELECT username, role, email FROM users ORDER BY username").all() as any[];
+    return jsonResponse(rows);
+  }
+
+  // ── POST /api/users ───────────────────────────────────────────
+  if (path === "/api/users" && method === "POST") {
+    const session = requireManager(req);
+    if (!session) return errorResponse("هذا الإجراء متاح للمدراء فقط", 403);
+    try {
+      const { username, password, role, email } = await req.json();
+
+      if (!username || typeof username !== "string" || username.trim().length < 2 || username.trim().length > 50)
+        return errorResponse("اسم المستخدم يجب أن يكون بين 2 و 50 حرف", 422);
+      if (!password || typeof password !== "string" || password.length < 4)
+        return errorResponse("كلمة المرور يجب أن تكون 4 أحرف على الأقل", 422);
+      if (!role || !["manager", "viewer"].includes(role))
+        return errorResponse("الصلاحية يجب أن تكون manager أو viewer", 422);
+      if (!email || typeof email !== "string" || !email.includes("@"))
+        return errorResponse("البريد الإلكتروني غير صالح", 422);
+
+      const existing = db.query("SELECT username FROM users WHERE username = ?").get(username.trim());
+      if (existing) return errorResponse("اسم المستخدم موجود مسبقاً", 409);
+
+      const hash = await Bun.password.hash(password);
+      db.run("INSERT INTO users (username, password_hash, role, email) VALUES (?, ?, ?, ?)",
+        [username.trim(), hash, role, email.trim()]);
+
+      audit(session.username, "CREATE_USER", `${username.trim()} (${role})`);
+      return jsonResponse({ username: username.trim(), role, email: email.trim() }, 201);
+    } catch {
+      return errorResponse("بيانات الطلب غير صالحة", 400);
+    }
+  }
+
   return errorResponse("المسار غير موجود", 404);
 }
 
