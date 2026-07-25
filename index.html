@@ -1,0 +1,1538 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>إدارة أسطبل شيهان</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --parchment: #F1E7D3;
+            --parchment-card: #FBF6EB;
+            --ink: #2B1D12;
+            --leather: #4A2E1E;
+            --leather-dark: #23140C;
+            --brass: #B8863B;
+            --brass-light: #E4C989;
+            --brass-pale: #F1E2C1;
+            --hunter: #3B5941;
+            --hunter-light: #E4ECE1;
+            --oxblood: #7A2E2A;
+            --oxblood-light: #F3E1DC;
+            --whatsapp: #2E7D46;
+            --management: #2C5B6B;
+            --management-light: #DFEBEE;
+            --pdf-color: #7A2E2A;
+            --radius: 14px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: var(--parchment);
+            background-image:
+                radial-gradient(circle at 15% 8%, rgba(184,134,59,0.07), transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(74,46,30,0.06), transparent 45%);
+            color: var(--ink);
+            padding-bottom: 96px;
+            font-size: 14px;
+            font-family: 'Almarai', sans-serif;
+        }
+        h1, h2, h3, .display-face { font-family: 'Aref Ruqaa', serif; }
+        .app-container { max-width: 480px; margin: 0 auto; padding: 16px; }
+
+        /* ===== Header ===== */
+        header {
+            background: linear-gradient(160deg, var(--leather-dark), var(--leather) 70%);
+            color: var(--parchment-card);
+            padding: 26px 20px 22px;
+            border-radius: var(--radius);
+            margin-bottom: 18px;
+            box-shadow: 0 14px 28px rgba(35, 20, 12, 0.28);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 3px solid var(--brass);
+        }
+        header::after {
+            content: '';
+            position: absolute;
+            width: 34px;
+            height: 34px;
+            border: 2px solid var(--brass-light);
+            opacity: 0.55;
+            bottom: 10px;
+            left: 10px;
+            border-right: none;
+            border-top: none;
+        }
+        header .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+        header .brand-icon {
+            width: 44px;
+            height: 44px;
+            border: 2px solid var(--brass);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--brass-light);
+            flex-shrink: 0;
+            animation: sway 5s ease-in-out infinite;
+        }
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        header p {
+            font-size: 0.8rem;
+            margin-top: 2px;
+            color: var(--brass-light);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        @keyframes sway {
+            0%, 100% { transform: rotate(-4deg); }
+            50% { transform: rotate(4deg); }
+        }
+
+        /* ===== Period selector ===== */
+        .period-selector { display: flex; gap: 8px; margin-bottom: 16px; }
+        .period-selector select {
+            flex: 1;
+            padding: 12px;
+            border: 1.5px solid var(--brass-light);
+            border-radius: 10px;
+            background: var(--parchment-card);
+            font-weight: 700;
+            font-family: 'Almarai', sans-serif;
+            color: var(--leather);
+            outline: none;
+        }
+
+        /* ===== Summary toggle ===== */
+        .btn-toggle-summary {
+            background: var(--parchment-card);
+            color: var(--leather);
+            border: 1.5px dashed var(--brass);
+            padding: 12px;
+            font-size: 0.88rem;
+            margin-bottom: 16px;
+        }
+        .btn-toggle-summary.open { background: var(--leather); color: var(--brass-light); border-style: solid; }
+
+        /* ===== Dashboard ===== */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+        .dash-card {
+            background: var(--parchment-card);
+            padding: 16px;
+            border-radius: var(--radius);
+            box-shadow: 0 3px 10px rgba(43,29,18,0.06);
+            border-top: 3px solid var(--brass);
+            position: relative;
+        }
+        .dash-card.full-width { grid-column: span 2; border-top-color: var(--hunter); }
+        .dash-card h3 {
+            font-family: 'Almarai', sans-serif;
+            font-size: 0.75rem;
+            color: var(--leather);
+            opacity: 0.75;
+            margin-bottom: 8px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .dash-card .value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--leather-dark);
+            letter-spacing: 0.3px;
+        }
+        .dash-card .sub-value { font-size: 0.72rem; margin-top: 5px; font-weight: 700; }
+
+        /* ===== Management report card ===== */
+        .mgmt-card {
+            background: var(--parchment-card);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 3px 10px rgba(43,29,18,0.06);
+            border: 1.5px dashed var(--brass-light);
+        }
+        .mgmt-card h3 { font-size: 1rem; margin-bottom: 6px; color: var(--leather); display: flex; align-items: center; gap: 8px; }
+        .mgmt-desc { font-size: 0.82rem; color: var(--ink); opacity: 0.65; margin-bottom: 14px; line-height: 1.6; }
+        .mgmt-buttons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+        /* ===== Login gate ===== */
+        .login-gate {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(160deg, var(--leather-dark), var(--leather) 70%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            z-index: 5000;
+            text-align: center;
+            padding: 20px;
+        }
+        .login-gate .brand-icon {
+            width: 64px; height: 64px;
+            border: 2px solid var(--brass);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; color: var(--brass-light);
+        }
+        .login-gate h1 { color: var(--parchment-card); font-size: 1.5rem; }
+        .login-gate p { color: var(--brass-light); font-size: 0.85rem; max-width: 280px; }
+        .btn-google-signin {
+            background: var(--parchment-card);
+            color: var(--leather);
+            padding: 13px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            width: auto;
+        }
+        .login-gate .login-error { color: var(--oxblood-light); font-size: 0.8rem; max-width: 300px; }
+
+        /* ===== Role status bar ===== */
+        .role-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: var(--parchment-card);
+            border: 1.5px dashed var(--brass-light);
+            border-radius: 10px;
+            padding: 9px 14px;
+            margin-bottom: 14px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        .role-status-bar.manager { border-color: var(--hunter); color: var(--hunter); }
+        .role-status-bar.error { border-color: var(--oxblood); color: var(--oxblood); }
+        .role-status-bar b { color: inherit; }
+        .role-status-bar .signout-btn {
+            background: none; border: none; color: var(--leather);
+            font-size: 0.72rem; font-weight: 700; cursor: pointer; opacity: 0.7;
+            font-family: 'Almarai', sans-serif;
+        }
+
+        /* ===== Search bar ===== */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--parchment-card);
+            border: 1.5px solid var(--brass-light);
+            border-radius: 10px;
+            padding: 6px 12px;
+            margin-bottom: 14px;
+        }
+        .search-bar i { color: var(--brass); opacity: 0.7; font-size: 0.9rem; }
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: 'Almarai', sans-serif;
+            font-size: 0.88rem;
+            color: var(--ink);
+            padding: 6px 0;
+        }
+        .search-bar input::placeholder { color: var(--ink); opacity: 0.4; }
+        .search-clear {
+            background: none;
+            border: none;
+            color: var(--oxblood);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        /* ===== Viewer mode: hide manage controls ===== */
+        body.viewer-mode .btn-pay-trigger,
+        body.viewer-mode .btn-unpay-trigger,
+        body.viewer-mode .btn-options,
+        body.viewer-mode .options-wrapper,
+        body.viewer-mode .directory-edit-btn,
+        body.viewer-mode .directory-add-btn,
+        body.viewer-mode #nav-add { display: none !important; }
+
+        /* ===== Header date badge ===== */
+        .header-date-corner {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            text-align: center;
+            line-height: 1.4;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--brass);
+            border-radius: 10px;
+            padding: 6px 12px;
+        }
+        .header-date-corner .weekday {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--brass-light);
+        }
+        .header-date-corner .datenum {
+            display: block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: rgba(241,231,211,0.75);
+            margin-top: 2px;
+        }
+
+        /* ===== Panels ===== */
+        .view-panel { animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--leather);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .badge-count {
+            background: var(--leather);
+            color: var(--brass-light);
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-family: 'Almarai', sans-serif;
+            font-weight: 700;
+        }
+
+        /* ===== Directory panel (professional ledger table) ===== */
+        .directory-table {
+            background: var(--parchment-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--brass-light);
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(43,29,18,0.06);
+        }
+        .directory-head {
+            display: grid;
+            grid-template-columns: 56px 1fr 92px 40px;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 14px;
+            background: linear-gradient(160deg, var(--leather-dark), var(--leather));
+            color: var(--brass-light);
+        }
+        .directory-head span {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            opacity: 0.9;
+        }
+        .directory-row {
+            display: grid;
+            grid-template-columns: 56px 1fr 92px 40px;
+            gap: 10px;
+            align-items: center;
+            padding: 11px 14px;
+            border-bottom: 1px solid #EEE3C9;
+        }
+        .directory-row:last-child { border-bottom: none; }
+        .directory-row:nth-child(even) { background: #F7F0DE; }
+        .directory-row .room-plaque {
+            font-size: 0.98rem;
+            font-weight: 800;
+            color: var(--leather);
+            background: var(--brass-pale);
+            border: 1px solid var(--brass);
+            border-radius: 7px;
+            text-align: center;
+            padding: 4px 0;
+        }
+        .directory-info { min-width: 0; }
+        .directory-info h4 { font-size: 0.92rem; font-weight: 700; color: var(--leather-dark); font-family: 'Almarai', sans-serif; }
+        .directory-sub { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.72rem; color: var(--ink); opacity: 0.6; margin-top: 2px; }
+        .directory-sub span { display: inline-flex; align-items: center; gap: 4px; direction: ltr; }
+        .directory-sub i { color: var(--brass); }
+        .directory-row .client-notes { margin: 6px 0 0; font-size: 0.74rem; padding: 6px 9px; }
+        .directory-rent { font-size: 0.85rem; font-weight: 800; color: var(--leather); text-align: center; white-space: nowrap; }
+        .directory-edit-btn { width: 34px; height: 34px; flex-shrink: 0; padding: 0; border-radius: 8px; }
+        .directory-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: var(--brass-pale);
+            border-top: 1.5px dashed var(--brass);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--leather);
+        }
+
+        /* ===== Client card (ledger index card) ===== */
+        .client-card {
+            background: var(--parchment-card);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 3px 8px rgba(43,29,18,0.06);
+            border: 1px solid #E9DCC0;
+            border-right: 3px solid var(--brass);
+            position: relative;
+        }
+        .client-row-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
+        .name-room-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .client-info-block .meta-tags-row { margin-bottom: 6px; }
+        .client-info-block h4 { font-size: 0.98rem; font-weight: 700; color: var(--leather-dark); font-family: 'Almarai', sans-serif; }
+        .client-meta { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+        .meta-tags-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .meta-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; background: #F1EADA; color: var(--ink); opacity: 0.75; font-weight: 700; }
+        .meta-tag.room {
+            background: var(--brass-pale);
+            color: var(--leather);
+            opacity: 1;
+            white-space: nowrap;
+            font-size: 1.05rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border: 1.5px solid var(--brass);
+            border-radius: 8px;
+            font-family: 'Almarai', sans-serif;
+        }
+        .price-badge { text-align: left; flex-shrink: 0; }
+        .price-badge .amt { font-size: 1.05rem; font-weight: 800; color: var(--leather); }
+        .price-badge .lbl { font-size: 0.65rem; color: var(--ink); opacity: 0.55; }
+
+        .client-notes {
+            font-size: 0.8rem;
+            color: var(--ink);
+            opacity: 0.8;
+            background: var(--brass-pale);
+            border-radius: 8px;
+            padding: 9px 11px;
+            margin-top: 4px;
+            margin-bottom: 12px;
+            line-height: 1.55;
+            position: relative;
+        }
+        .client-notes i { color: var(--brass); margin-left: 4px; }
+
+        /* wax-seal style status stamp */
+        .status-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 10px;
+            border-radius: 9px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            border: 1.5px dashed;
+        }
+        .status-strip.paid { background-color: var(--hunter-light); color: var(--hunter); border-color: var(--hunter); }
+        .status-strip.unpaid { background-color: var(--oxblood-light); color: var(--oxblood); border-color: var(--oxblood); }
+        .status-strip .stamp {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .client-mini-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.76rem;
+            color: var(--ink);
+            opacity: 0.6;
+            margin-bottom: 10px;
+            direction: ltr;
+            text-align: center;
+        }
+        .client-mini-info span { display: inline-flex; align-items: center; gap: 5px; }
+        .client-mini-info i { color: var(--brass); }
+
+        /* ===== Actions ===== */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+        .action-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+        .action-grid.two-col { grid-template-columns: 1.4fr 1fr; }
+        .options-wrapper { position: relative; }
+        .btn-options { background-color: #E4DCC9; color: var(--leather); height: 100%; }
+        .options-menu {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--parchment-card);
+            border: 1.5px solid var(--brass-light);
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(43,29,18,0.18);
+            overflow: hidden;
+            z-index: 50;
+            animation: fadeIn 0.15s ease-out;
+        }
+        .options-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 11px 14px;
+            background: none;
+            border: none;
+            font-family: 'Almarai', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--leather);
+            text-decoration: none;
+            cursor: pointer;
+            text-align: right;
+            border-bottom: 1px solid #EDE3CB;
+        }
+        .options-menu-item:last-child { border-bottom: none; }
+        .options-menu-item i { color: var(--brass); width: 16px; }
+        .options-menu-item.danger { color: var(--oxblood); }
+        .options-menu-item.danger i { color: var(--oxblood); }
+        .action-full-row { width: 100%; }
+        .btn {
+            padding: 9px 10px;
+            border: none;
+            border-radius: 9px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            font-family: 'Almarai', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: var(--transition);
+            width: 100%;
+        }
+        .btn-options { direction: ltr; }
+        .btn:active { transform: scale(0.97); }
+        .btn-pay-trigger { background-color: var(--hunter); color: white; }
+        .btn-unpay-trigger { background-color: #E4DCC9; color: var(--leather); }
+        .btn-edit { background-color: var(--management-light); color: var(--management); }
+        .btn-delete { background-color: var(--oxblood-light); color: var(--oxblood); }
+        .btn-whatsapp { background-color: var(--whatsapp); color: white; }
+        .btn-whatsapp:hover { background-color: #256B3B; }
+        .btn-management { background-color: var(--management); color: white; font-size: 0.85rem; }
+        .btn-pdf { background-color: var(--pdf-color); color: white; font-size: 0.85rem; }
+        .btn-submit { background-color: var(--leather); color: var(--brass-light); padding: 14px; font-size: 1rem; margin-top: 10px; }
+        .btn-cancel { background-color: #E4DCC9; color: var(--leather); }
+
+        /* ===== Forms ===== */
+        .form-card { background: var(--parchment-card); padding: 20px; border-radius: var(--radius); box-shadow: 0 3px 10px rgba(43,29,18,0.06); border: 1.5px dashed var(--brass-light); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.84rem; color: var(--leather); }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #E2D6B8;
+            border-radius: 9px;
+            outline: none;
+            font-size: 1rem;
+            font-family: 'Almarai', sans-serif;
+            background: white;
+            color: var(--ink);
+        }
+        .form-group input:focus { border-color: var(--brass); box-shadow: 0 0 0 3px rgba(184,134,59,0.15); }
+        .form-group .phone-input-container { display: flex; direction: ltr; }
+        .form-group .phone-input-container input { border-top-right-radius: 0; border-bottom-right-radius: 0; text-align: left; }
+        .form-group .phone-prefix {
+            background: var(--brass-pale);
+            padding: 12px;
+            border: 1.5px solid #E2D6B8;
+            border-right: none;
+            border-top-right-radius: 9px;
+            border-bottom-right-radius: 9px;
+            font-weight: 800;
+            color: var(--leather);
+            display: flex;
+            align-items: center;
+        }
+
+        /* ===== Bottom nav ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 72px;
+            background: linear-gradient(180deg, var(--leather), var(--leather-dark));
+            box-shadow: 0 -6px 20px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            max-width: 480px;
+            margin: 0 auto;
+            border-top: 2px solid var(--brass);
+            border-radius: 18px 18px 0 0;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: rgba(241,231,211,0.55);
+            cursor: pointer; font-weight: 700; font-size: 0.72rem;
+            width: auto; flex: 1; position: relative;
+            background: none; border: none; font-family: 'Almarai', sans-serif;
+            transition: var(--transition);
+        }
+        .nav-item i { font-size: 1.25rem; margin-bottom: 4px; transition: var(--transition); }
+        .nav-item.active { color: var(--brass-light); }
+        .nav-item.active i { transform: translateY(-3px); }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            width: 18px;
+            height: 2.5px;
+            background: var(--brass-light);
+            border-radius: 2px;
+        }
+        .nav-item .badge {
+            position: absolute; top: -6px; right: 16px;
+            background: var(--oxblood);
+            color: white; font-size: 0.62rem;
+            padding: 1px 5px; border-radius: 10px; font-weight: 700;
+            border: 1.5px solid var(--leather-dark);
+        }
+
+        .hidden { display: none !important; }
+        .empty-state { text-align: center; padding: 46px 20px; color: var(--ink); opacity: 0.5; }
+        .empty-state i { font-size: 2.8rem; color: var(--brass-light); margin-bottom: 14px; display: block; }
+        .empty-state p { font-weight: 700; }
+
+        /* ===== Edit modal ===== */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(35,20,12,0.55);
+            display: flex; align-items: flex-end; justify-content: center;
+            z-index: 2000;
+        }
+        .modal-box {
+            background: var(--parchment-card);
+            width: 100%; max-width: 480px;
+            border-radius: 20px 20px 0 0;
+            padding: 22px 20px;
+            max-height: 85vh; overflow-y: auto;
+            animation: fadeIn 0.2s ease-out;
+            border-top: 3px solid var(--brass);
+        }
+        .modal-box h3 { color: var(--leather); margin-bottom: 16px; font-size: 1.15rem; display: flex; align-items: center; gap: 8px; }
+        .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.001ms !important; }
+        }
+
+        @media print {
+            body { background: white; color: black; padding: 0; font-size: 12pt; }
+            .app-container { max-width: 100%; padding: 0; }
+            header { background: #3D2817 !important; color: white !important; border-radius: 0; box-shadow: none; padding: 15px; }
+            .period-selector, .mgmt-card, .search-bar-container, .bottom-nav, .action-grid, .action-full-row, #panel-add, #panel-directory, .modal-overlay { display: none !important; }
+            .dash-card { border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; }
+            .dash-card.full-width { grid-column: span 2; border-right: 4px solid #B8863B !important; }
+            .client-card { page-break-inside: avoid; border: 1px solid #aaa !important; margin-bottom: 10px !important; background: white !important; box-shadow: none !important; }
+            .status-strip { border: 1px solid #ccc !important; background: #f9f9f9 !important; color: black !important; }
+            .view-panel { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-gate" id="loginGate">
+        <div class="brand-icon"><i class="fa-solid fa-horseshoe"></i></div>
+        <h1>إدارة أسطبل شيهان</h1>
+        <p>أدخل اسم المستخدم وكلمة المرور للدخول إلى النظام</p>
+        <form onsubmit="loginWithPassword(event)" style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px;">
+            <input type="text" id="loginUsername" placeholder="اسم المستخدم" required 
+                style="padding:12px;border-radius:10px;border:none;font-family:'Almarai',sans-serif;font-size:0.95rem;text-align:center;">
+            <input type="password" id="loginPassword" placeholder="كلمة المرور" required
+                style="padding:12px;border-radius:10px;border:none;font-family:'Almarai',sans-serif;font-size:0.95rem;text-align:center;">
+            <button type="submit" class="btn btn-google-signin">
+                <i class="fa-solid fa-key"></i> تسجيل الدخول
+            </button>
+        </form>
+        <div class="login-error hidden" id="loginErrorMsg"></div>
+    </div>
+
+    <div class="app-container">
+
+        <header>
+            <div class="brand-row">
+                <div class="brand-icon"><i class="fa-solid fa-horseshoe"></i></div>
+                <div>
+                    <h1>إدارة أسطبل شيهان</h1>
+                    <p>سجل الإيجارات والعملاء</p>
+                </div>
+            </div>
+            <div class="header-date-corner">
+                <span class="weekday" id="todayWeekday">--</span>
+                <span class="datenum" id="todayDateNum">--</span>
+            </div>
+        </header>
+
+        <div class="period-selector">
+            <select id="yearSelector" onchange="changePeriodContext()">
+                <option value="2026">السنة المستهدفة: 2026</option>
+                <option value="2027">السنة المستهدفة: 2027</option>
+            </select>
+            <select id="monthSelector" onchange="changePeriodContext()">
+                <option value="01">يناير</option>
+                <option value="02">فبراير</option>
+                <option value="03">مارس</option>
+                <option value="04">أبريل</option>
+                <option value="05">مايو</option>
+                <option value="06">يونيو</option>
+                <option value="07" selected>يوليو</option>
+                <option value="08">أغسطس</option>
+                <option value="09">سبتمبر</option>
+                <option value="10">أكتوبر</option>
+                <option value="11">نوفمبر</option>
+                <option value="12">ديسمبر</option>
+            </select>
+        </div>
+
+        <div class="role-status-bar" id="roleStatusBar">
+            <span id="roleStatusText">--</span>
+            <button class="signout-btn" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
+        </div>
+
+        <div class="search-bar hidden" id="searchBar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="ابحث عن عميل بالاسم، رقم الهاتف، أو الغرفة..." oninput="handleSearch()">
+            <button class="search-clear hidden" id="searchClear" onclick="clearSearch()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <button class="btn btn-toggle-summary" id="toggleSummaryBtn" onclick="toggleFinancialSummary()">
+            <i class="fa-solid fa-chart-pie"></i> عرض الملخص المالي وتقارير الإدارة
+        </button>
+
+        <div id="financialSummarySection" class="hidden">
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <h3><i class="fa-solid fa-circle-check" style="color:var(--hunter)"></i> المدفوعات المستلمة</h3>
+                    <div class="value" id="statCollected">0 ر.ق</div>
+                    <div class="sub-value" id="statCollectedCount" style="color:var(--hunter)">0 عملاء</div>
+                </div>
+                <div class="dash-card">
+                    <h3><i class="fa-solid fa-triangle-exclamation" style="color:var(--oxblood)"></i> المتأخرات المطلوبة</h3>
+                    <div class="value" id="statPending">0 ر.ق</div>
+                    <div class="sub-value" id="statPendingCount" style="color:var(--oxblood)">0 عملاء</div>
+                </div>
+                <div class="dash-card full-width">
+                    <h3><i class="fa-solid fa-coins" style="color:var(--brass)"></i> إجمالي السنة المالي الحالي (YTD)</h3>
+                    <div class="value" id="statYTD">0 ر.ق</div>
+                    <div class="sub-value" style="color:var(--ink); opacity:0.55;">محسوب بناءً على تراكمات العمليات المسجلة للعام الحالي</div>
+                </div>
+            </div>
+
+            <div class="mgmt-card">
+                <h3><i class="fa-solid fa-file-invoice" style="color:var(--management)"></i> تقارير الإدارة والملاك</h3>
+                <div class="mgmt-desc">اختر الوسيلة المناسبة لمشاركة البيانات الحالية مع الإدارة العليا أو طباعتها وحفظها كملف كشف حساب رسمي.</div>
+                <div class="mgmt-buttons-grid">
+                    <button class="btn btn-management" onclick="shareManagementReport()"><i class="fa-brands fa-whatsapp"></i> إرسال واتساب</button>
+                    <button class="btn btn-pdf" onclick="generatePDFReport()"><i class="fa-solid fa-file-pdf"></i> طباعة / حفظ PDF</button>
+                </div>
+            </div>
+
+            <div class="mgmt-card">
+                <h3><i class="fa-solid fa-database" style="color:var(--hunter)"></i> النسخ الاحتياطي للبيانات</h3>
+                <div class="mgmt-desc">نزّل نسخة احتياطية بصيغة JSON بشكل دوري لحفظ بياناتك بأمان، ويمكنك استعادتها لاحقاً أو نقلها لموقع آخر.</div>
+                <div class="mgmt-buttons-grid">
+                    <button class="btn btn-management" onclick="exportBackup()"><i class="fa-solid fa-download"></i> تنزيل نسخة احتياطية</button>
+                    <button class="btn btn-pdf" onclick="document.getElementById('backupFileInput').click()"><i class="fa-solid fa-upload"></i> استعادة نسخة احتياطية</button>
+                </div>
+                <input type="file" id="backupFileInput" accept="application/json" class="hidden" onchange="importBackup(event)">
+            </div>
+        </div>
+
+        <div id="panel-all" class="view-panel">
+            <div class="panel-title">جميع الغرف والعملاء المودعين <span class="badge-count" id="count-all">0</span></div>
+            <div id="container-all"></div>
+        </div>
+
+        <div id="panel-unpaid" class="view-panel hidden">
+            <div class="panel-title">كشف المتأخرين عن السداد <span class="badge-count" id="count-unpaid">0</span></div>
+            <div id="container-unpaid"></div>
+        </div>
+
+        <div id="panel-paid" class="view-panel hidden">
+            <div class="panel-title">العملاء الملتزمين بالدفع <span class="badge-count" id="count-paid">0</span></div>
+            <div id="container-paid"></div>
+        </div>
+
+        <div id="panel-directory" class="view-panel hidden">
+            <div class="panel-title">قائمة العملاء ومعلوماتهم <span class="badge-count" id="count-directory">0</span></div>
+            <button class="btn btn-submit directory-add-btn" onclick="navigateToPanel('add')" style="margin-top:0; margin-bottom:14px;">
+                <i class="fa-solid fa-plus"></i> إضافة عميل جديد
+            </button>
+            <div class="directory-table">
+                <div class="directory-head">
+                    <span>الغرفة</span>
+                    <span>العميل</span>
+                    <span>الإيجار</span>
+                    <span></span>
+                </div>
+                <div id="container-directory"></div>
+                <div class="directory-summary">
+                    <span><i class="fa-solid fa-users"></i> إجمالي العملاء: <span id="directoryTotalCount">0</span></span>
+                    <span><i class="fa-solid fa-coins"></i> إجمالي الإيجارات: <span id="directoryTotalRent">0</span> ر.ق</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-add" class="view-panel hidden">
+            <div class="panel-title">إضافة وحدة تأجيرية وعميل جديد</div>
+            <div class="form-card">
+                <form id="addClientForm" onsubmit="executeAddClient(event)">
+                    <div class="form-group">
+                        <label>اسم العميل الثنائي / الثلاثي</label>
+                        <input type="text" id="newClientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>رقم هاتف التواصل (للواتساب)</label>
+                        <div class="phone-input-container">
+                            <input type="text" id="newClientPhone" required>
+                            <span class="phone-prefix">+974</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>معرف الغرفة / البوكس</label>
+                        <input type="text" id="newClientRoom" required>
+                    </div>
+                    <div class="form-group">
+                        <label>قيمة عقد الإيجار الشهري المعتمد (ر.ق)</label>
+                        <input type="number" id="newClientRent" required>
+                    </div>
+                    <div class="form-group">
+                        <label>معلومات إضافية عن العميل (اختياري)</label>
+                        <input type="text" id="newClientNotes" placeholder="مثال: عدد الخيول، ملاحظات، جهة اتصال بديلة...">
+                    </div>
+                    <button type="submit" class="btn btn-submit"><i class="fa-solid fa-check"></i> اعتماد وإدراج بالنظام</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay hidden" id="editModalOverlay">
+        <div class="modal-box">
+            <h3><i class="fa-solid fa-pen-to-square"></i> تعديل بيانات العميل</h3>
+            <form id="editClientForm" onsubmit="saveEditClient(event)">
+                <input type="hidden" id="editClientId">
+                <div class="form-group">
+                    <label>اسم العميل</label>
+                    <input type="text" id="editClientName" required>
+                </div>
+                <div class="form-group">
+                    <label>رقم هاتف التواصل (للواتساب)</label>
+                    <div class="phone-input-container">
+                        <input type="text" id="editClientPhone" required>
+                        <span class="phone-prefix">+974</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>معرف الغرفة / البوكس</label>
+                    <input type="text" id="editClientRoom" required>
+                </div>
+                <div class="form-group">
+                    <label>قيمة عقد الإيجار الشهري (ر.ق)</label>
+                    <input type="number" id="editClientRent" required>
+                </div>
+                <div class="form-group">
+                    <label>معلومات إضافية عن العميل (اختياري)</label>
+                    <input type="text" id="editClientNotes" placeholder="مثال: عدد الخيول، ملاحظات، جهة اتصال بديلة...">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeEditModal()">إلغاء</button>
+                    <button type="submit" class="btn btn-submit" style="margin-top:0;">حفظ التعديلات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" id="nav-all" onclick="navigateToPanel('all')">
+            <i class="fa-solid fa-list"></i> الكل
+        </button>
+        <button class="nav-item" id="nav-unpaid" onclick="navigateToPanel('unpaid')">
+            <i class="fa-solid fa-clock"></i> المتأخرين
+            <span class="badge hidden" id="badge-unpaid-counter">0</span>
+        </button>
+        <button class="nav-item" id="nav-paid" onclick="navigateToPanel('paid')">
+            <i class="fa-solid fa-circle-check"></i> الخالصين
+        </button>
+        <button class="nav-item" id="nav-directory" onclick="navigateToPanel('directory')">
+            <i class="fa-solid fa-address-book"></i> قائمة العملاء
+        </button>
+    </nav>
+
+    <script>
+        // ── Auth state ───────────────────────────────────────────────
+        let authToken = localStorage.getItem('authToken') || null;
+        let masterClientsList = [];
+        let currentActivePanel = 'all';
+        let searchQuery = '';
+        let dataLoaded = false;
+        let isManager = false;
+        let currentUserEmail = '';
+
+        const monthNamesAr = {
+            "01": "يناير", "02": "فبراير", "03": "مارس", "04": "أبريل", "05": "مايو", "06": "يونيو",
+            "07": "يوليو", "08": "أغسطس", "09": "سبتمبر", "10": "أكتوبر", "11": "نوفمبر", "12": "ديسمبر"
+        };
+
+        // ── API helper ───────────────────────────────────────────────
+        async function api(path, options = {}) {
+            const headers = { 'Content-Type': 'application/json', ...options.headers };
+            if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+            const res = await fetch(path, { ...options, headers });
+            if (res.status === 401) {
+                clearAuth();
+                return null;
+            }
+            return res;
+        }
+
+        function clearAuth() {
+            authToken = null;
+            localStorage.removeItem('authToken');
+            isManager = false;
+            currentUserEmail = '';
+            masterClientsList = [];
+            dataLoaded = false;
+            document.getElementById('loginGate').classList.remove('hidden');
+            document.getElementById('roleStatusBar').classList.add('hidden');
+            document.getElementById('searchBar').classList.add('hidden');
+            document.body.classList.add('viewer-mode');
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        }
+
+        // ── Auth functions ───────────────────────────────────────────
+        async function initAuth() {
+            if (!authToken) {
+                document.getElementById('loginGate').classList.remove('hidden');
+                return;
+            }
+            const res = await api('/api/session');
+            if (!res || !res.ok) return;
+            const session = await res.json();
+            currentUserEmail = session.email;
+            isManager = session.role === 'manager';
+            document.getElementById('loginGate').classList.add('hidden');
+            document.getElementById('roleStatusBar').classList.remove('hidden');
+            applyRoleVisibility();
+            await fetchClients();
+            navigateToPanel('all');
+            document.getElementById('searchBar').classList.remove('hidden');
+        }
+
+        async function loginWithPassword(event) {
+            event.preventDefault();
+            const errorBox = document.getElementById('loginErrorMsg');
+            errorBox.classList.add('hidden');
+
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    errorBox.innerText = data.error || 'تعذر تسجيل الدخول';
+                    errorBox.classList.remove('hidden');
+                    return;
+                }
+                authToken = data.token;
+                localStorage.setItem('authToken', authToken);
+                currentUserEmail = data.email;
+                isManager = data.role === 'manager';
+                document.getElementById('loginGate').classList.add('hidden');
+                document.getElementById('roleStatusBar').classList.remove('hidden');
+                document.getElementById('searchBar').classList.remove('hidden');
+                applyRoleVisibility();
+                await fetchClients();
+                navigateToPanel('all');
+            } catch (e) {
+                errorBox.innerText = 'تعذر الاتصال بالخادم';
+                errorBox.classList.remove('hidden');
+            }
+        }
+
+        function logoutUser() {
+            if (authToken) {
+                fetch('/api/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                }).catch(() => {});
+            }
+            clearAuth();
+            if (window._refreshInterval) {
+                clearInterval(window._refreshInterval);
+                window._refreshInterval = null;
+            }
+        }
+
+        function applyRoleVisibility() {
+            document.body.classList.toggle('viewer-mode', !isManager);
+            const roleText = document.getElementById('roleStatusText');
+            const roleBar = document.getElementById('roleStatusBar');
+            if (roleText) {
+                roleText.innerHTML = isManager
+                    ? `<i class="fa-solid fa-user-shield"></i> مدير — ${currentUserEmail}`
+                    : `<i class="fa-solid fa-eye"></i> مشاهد فقط — ${currentUserEmail}`;
+            }
+            if (roleBar) roleBar.classList.toggle('manager', isManager);
+        }
+
+        // ── Data fetching ────────────────────────────────────────────
+        async function fetchClients() {
+            const res = await api('/api/clients');
+            if (!res || !res.ok) return;
+            masterClientsList = await res.json();
+            dataLoaded = true;
+            recalculateFinancials();
+            renderActiveViewLayout();
+
+            // Start auto-refresh polling (every 30s)
+            if (!window._refreshInterval) {
+                window._refreshInterval = setInterval(() => {
+                    if (authToken) fetchClients();
+                }, 30000);
+            }
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            const clearBtn = document.getElementById('searchClear');
+            if (searchQuery) clearBtn.classList.remove('hidden');
+            else clearBtn.classList.add('hidden');
+            renderActiveViewLayout();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            handleSearch();
+        }
+
+        function requireManager() {
+            if (!isManager) {
+                alert('هذا الإجراء متاح للمدراء فقط. لا تملك صلاحية التعديل.');
+                return false;
+            }
+            return true;
+        }
+
+        function toggleFinancialSummary() {
+            const section = document.getElementById('financialSummarySection');
+            const btn = document.getElementById('toggleSummaryBtn');
+            const isHidden = section.classList.contains('hidden');
+            if (isHidden) {
+                section.classList.remove('hidden');
+                btn.classList.add('open');
+                btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i> إخفاء الملخص المالي وتقارير الإدارة';
+            } else {
+                section.classList.add('hidden');
+                btn.classList.remove('open');
+                btn.innerHTML = '<i class="fa-solid fa-chart-pie"></i> عرض الملخص المالي وتقارير الإدارة';
+            }
+        }
+
+        function toggleOptionsMenu(clientId) {
+            const menu = document.getElementById(`options-menu-${clientId}`);
+            if (!menu) return;
+            const isHidden = menu.classList.contains('hidden');
+            closeAllOptionsMenus();
+            if (isHidden) menu.classList.remove('hidden');
+        }
+
+        function closeAllOptionsMenus() {
+            document.querySelectorAll('.options-menu').forEach(el => el.classList.add('hidden'));
+        }
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.options-wrapper')) {
+                closeAllOptionsMenus();
+            }
+        });
+
+        function getTargetPeriod() {
+            const year = document.getElementById('yearSelector').value;
+            const month = document.getElementById('monthSelector').value;
+            return `${year}-${month}`;
+        }
+
+        function changePeriodContext() {
+            recalculateFinancials();
+            renderActiveViewLayout();
+        }
+
+        function recalculateFinancials() {
+            const targetPeriod = getTargetPeriod();
+            const targetYear = document.getElementById('yearSelector').value;
+            let monthPaidAmt = 0;
+            let monthPaidCount = 0;
+            let monthUnpaidAmt = 0;
+            let monthUnpaidCount = 0;
+            let yearToDateAggregate = 0;
+
+            masterClientsList.forEach(client => {
+                const hasPaidThisMonth = client.history.includes(targetPeriod);
+                if (hasPaidThisMonth) {
+                    monthPaidAmt += Number(client.rent);
+                    monthPaidCount++;
+                } else {
+                    monthUnpaidAmt += Number(client.rent);
+                    monthUnpaidCount++;
+                }
+                const completedMonthsInSelectedYear = client.history.filter(p => p.startsWith(targetYear)).length;
+                yearToDateAggregate += (completedMonthsInSelectedYear * Number(client.rent));
+            });
+
+            document.getElementById('statCollected').innerText = `${monthPaidAmt} ر.ق`;
+            document.getElementById('statCollectedCount').innerText = `${monthPaidCount} عملاء`;
+            document.getElementById('statPending').innerText = `${monthUnpaidAmt} ر.ق`;
+            document.getElementById('statPendingCount').innerText = `${monthUnpaidCount} عملاء`;
+            document.getElementById('statYTD').innerText = `${yearToDateAggregate} ر.ق`;
+
+            const badge = document.getElementById('badge-unpaid-counter');
+            if (monthUnpaidCount > 0) {
+                badge.innerText = monthUnpaidCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function navigateToPanel(panelId) {
+            currentActivePanel = panelId;
+            const navEl = document.getElementById(`nav-${panelId}`);
+            if (navEl) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                navEl.classList.add('active');
+            }
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`panel-${panelId}`).classList.remove('hidden');
+            renderActiveViewLayout();
+        }
+
+        function getRoomNumber(roomStr) {
+            const match = String(roomStr).match(/\d+/);
+            return match ? parseInt(match[0], 10) : Infinity;
+        }
+
+        function getRoomLabel(roomStr) {
+            const match = String(roomStr).match(/\d+/);
+            return match ? match[0] : roomStr;
+        }
+
+        function renderActiveViewLayout() {
+            const targetPeriod = getTargetPeriod();
+
+            let filteredList = [...masterClientsList];
+
+            // Apply search filter
+            if (searchQuery) {
+                filteredList = filteredList.filter(c =>
+                    c.name.toLowerCase().includes(searchQuery) ||
+                    c.phone.includes(searchQuery) ||
+                    c.room.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            filteredList.sort((a, b) => getRoomNumber(a.room) - getRoomNumber(b.room));
+
+            document.getElementById('count-all').innerText = masterClientsList.length;
+            document.getElementById('count-unpaid').innerText = masterClientsList.filter(c => !c.history.includes(targetPeriod)).length;
+            document.getElementById('count-paid').innerText = masterClientsList.filter(c => c.history.includes(targetPeriod)).length;
+            document.getElementById('count-directory').innerText = masterClientsList.length;
+
+            if (currentActivePanel === 'all') {
+                buildListDOM(filteredList, 'container-all', targetPeriod);
+            } else if (currentActivePanel === 'unpaid') {
+                let unpaidList = filteredList.filter(c => !c.history.includes(targetPeriod));
+                buildListDOM(unpaidList, 'container-unpaid', targetPeriod);
+            } else if (currentActivePanel === 'paid') {
+                let paidList = filteredList.filter(c => c.history.includes(targetPeriod));
+                buildListDOM(paidList, 'container-paid', targetPeriod);
+            } else if (currentActivePanel === 'directory') {
+                buildDirectoryDOM(filteredList, 'container-directory');
+            }
+        }
+
+        function buildDirectoryDOM(list, elementId) {
+            const targetContainer = document.getElementById(elementId);
+            targetContainer.innerHTML = '';
+
+            const totalRent = list.reduce((sum, c) => sum + Number(c.rent), 0);
+            document.getElementById('directoryTotalCount').innerText = list.length;
+            document.getElementById('directoryTotalRent').innerText = totalRent;
+
+            if (list.length === 0) {
+                targetContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-address-book"></i><p>لا يوجد عملاء مسجلون بعد</p></div>`;
+                return;
+            }
+
+            list.forEach(client => {
+                const rowElement = document.createElement('div');
+                rowElement.className = 'directory-row';
+                rowElement.innerHTML = `
+                    <span class="room-plaque">${getRoomLabel(client.room)}</span>
+                    <div class="directory-info">
+                        <h4>${client.name}</h4>
+                        <div class="directory-sub">
+                            <span><i class="fa-solid fa-phone"></i> +974 ${client.phone}</span>
+                        </div>
+                        ${client.notes ? `<div class="client-notes"><i class="fa-solid fa-note-sticky"></i>${client.notes}</div>` : ''}
+                    </div>
+                    <div class="directory-rent">${client.rent}<br><span style="font-size:0.6rem; font-weight:700; opacity:0.6;">ر.ق</span></div>
+                    <button class="btn btn-edit directory-edit-btn" onclick="openEditModal('${client.id}')">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                `;
+                targetContainer.appendChild(rowElement);
+            });
+        }
+
+        function buildListDOM(list, elementId, targetPeriod) {
+            const targetContainer = document.getElementById(elementId);
+            targetContainer.innerHTML = '';
+
+            if (list.length === 0) {
+                targetContainer.innerHTML = `<div class="empty-state"><i class="fa-solid fa-horseshoe"></i><p>لا توجد سجلات مطابقة لمعايير العرض والبحث الحالية</p></div>`;
+                return;
+            }
+
+            const currentMonthCode = targetPeriod.split('-')[1];
+            const currentYearCode = targetPeriod.split('-')[0];
+            const currentMonthText = monthNamesAr[currentMonthCode] + " " + currentYearCode;
+
+            list.forEach(client => {
+                const paidStatus = client.history.includes(targetPeriod);
+                const itemElement = document.createElement('div');
+                itemElement.className = 'client-card';
+
+                let messageText = "";
+                if (paidStatus) {
+                    messageText = `مرحباً أخي ${client.name}، تم استلام واستحقاق دفعة إيجار الغرفة (${client.room}) لشهر ${currentMonthText} بمبلغ قدره ${client.rent} ر.ق بنجاح. شكراً لك!`;
+                } else {
+                    messageText = `مرحباً أخي ${client.name}، نود تذكيركم بلطف بأن إيجار الغرفة (${client.room}) لشهر ${currentMonthText} والمقدر بقيمة ${client.rent} ر.ق مستحق السداد حالياً. يرجى التكرم بالتحويل في أقرب وقت. شاكرين لك تعاونك.`;
+                }
+                const encodedMsg = encodeURIComponent(messageText);
+                const fullPhone = `974${client.phone}`;
+
+                itemElement.innerHTML = `
+                    <div class="client-row-main">
+                        <div class="client-info-block">
+                            <div class="name-room-row">
+                                <span class="meta-tag room">${getRoomLabel(client.room)}</span>
+                                <h4>${client.name}</h4>
+                            </div>
+                        </div>
+                        <div class="price-badge">
+                            <div class="amt">${client.rent}</div>
+                            <div class="lbl">ر.ق مستحق</div>
+                        </div>
+                    </div>
+                    ${client.notes ? `<div class="client-notes"><i class="fa-solid fa-note-sticky"></i>${client.notes}</div>` : ''}
+                    <div class="status-strip ${paidStatus ? 'paid' : 'unpaid'}">
+                        <span class="stamp"><i class="fa-solid ${paidStatus ? 'fa-stamp' : 'fa-hourglass-half'}"></i> ${paidStatus ? 'تم الدفع' : 'بانتظار الدفع'}</span>
+                        <span>${paidStatus ? 'خالص الحساب' : 'مستحق'}</span>
+                    </div>
+                    <div class="action-grid two-col">
+                        <button class="btn ${paidStatus ? 'btn-unpay-trigger' : 'btn-pay-trigger'}" onclick="togglePaymentTransaction('${client.id}', '${targetPeriod}')">
+                            ${paidStatus ? '↩️ إلغاء' : '✔️ دافع بالكامل'}
+                        </button>
+                        <div class="options-wrapper">
+                            <button class="btn btn-options" onclick="toggleOptionsMenu('${client.id}')">
+                                <i class="fa-solid fa-circle-user"></i> +974 ${client.phone}
+                            </button>
+                            <div class="options-menu hidden" id="options-menu-${client.id}">
+                                <button class="options-menu-item" onclick="closeAllOptionsMenus(); openEditModal('${client.id}')">
+                                    <i class="fa-solid fa-pen"></i> تعديل
+                                </button>
+                                <a class="options-menu-item" href="https://wa.me/${fullPhone}?text=${encodedMsg}" target="_blank" onclick="closeAllOptionsMenus()">
+                                    <i class="fa-brands fa-whatsapp"></i> واتساب
+                                </a>
+                                <button class="options-menu-item danger" onclick="closeAllOptionsMenus(); executeDeleteClient('${client.id}')">
+                                    <i class="fa-solid fa-trash"></i> حذف
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                targetContainer.appendChild(itemElement);
+            });
+        }
+
+        function generatePDFReport() {
+            navigateToPanel('all');
+            renderActiveViewLayout();
+            window.print();
+        }
+
+        function shareManagementReport() {
+            const targetPeriod = getTargetPeriod();
+            const currentMonthCode = targetPeriod.split('-')[1];
+            const currentYearCode = targetPeriod.split('-')[0];
+            const currentMonthText = monthNamesAr[currentMonthCode] + " " + currentYearCode;
+
+            let totalRooms = masterClientsList.length;
+            let totalPaidAmt = 0;
+            let totalUnpaidAmt = 0;
+            let unpaidClientsText = "";
+            let paidCount = 0;
+            let unpaidCount = 0;
+
+            masterClientsList.forEach((client) => {
+                if (client.history.includes(targetPeriod)) {
+                    totalPaidAmt += Number(client.rent);
+                    paidCount++;
+                } else {
+                    totalUnpaidAmt += Number(client.rent);
+                    unpaidCount++;
+                    unpaidClientsText += `${unpaidCount}- ${client.name} (غرفة: ${client.room}) - ${client.rent} ر.ق\n`;
+                }
+            });
+
+            let reportText = `📋 *التقرير المالي التنفيذي لمستودعات الخيل*\n`;
+            reportText += `🗓 *الفترة المستهدفة:* ${currentMonthText}\n`;
+            reportText += `=========================\n\n`;
+            reportText += `📊 *ملخص الحالة العامة:*\n`;
+            reportText += `▪️ إجمالي عدد الغرف النشطة: ${totalRooms}\n`;
+            reportText += `▪️ عدد الغرف المسددة: ${paidCount}\n`;
+            reportText += `▪️ عدد الغرف المتعثرة/المتبقية: ${unpaidCount}\n\n`;
+            reportText += `💰 *الوضع المالي للشهر الحالي:*\n`;
+            reportText += `✅ المبالغ المستلمة: *${totalPaidAmt} ر.ق*\n`;
+            reportText += `⚠️ المتأخرات المطلوبة: *${totalUnpaidAmt} ر.ق*\n\n`;
+
+            if (unpaidCount > 0) {
+                reportText += `⚠️ *قائمة العملاء المتأخرين عن السداد:*\n`;
+                reportText += unpaidClientsText;
+            } else {
+                reportText += `🎉 *ملاحظة:* تم تحصيل جميع الإيجارات لشهر ${monthNamesAr[currentMonthCode]} بنسبة 100%.\n`;
+            }
+            reportText += `\n🤖 _تم إنشاء هذا التقرير تلقائياً عبر نظام إدارة المستودعات._`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: `تقرير مستودعات الخيل - ${currentMonthText}`,
+                    text: reportText
+                }).catch(() => {
+                    fallbackShare(reportText);
+                });
+            } else {
+                fallbackShare(reportText);
+            }
+        }
+
+        function fallbackShare(text) {
+            const encodedText = encodeURIComponent(text);
+            window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+        }
+
+        async function togglePaymentTransaction(clientId, periodStr) {
+            if (!requireManager()) return;
+            const res = await api(`/api/clients/${clientId}/payment`, {
+                method: 'PUT',
+                body: JSON.stringify({ period: periodStr })
+            });
+            if (!res) return;
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                alert('تعذر تحديث حالة الدفع: ' + (data.error || res.statusText));
+                return;
+            }
+            // Optimistically update local state; re-fetch for consistency
+            const result = await res.json();
+            const client = masterClientsList.find(c => c.id === clientId);
+            if (client) client.history = result.history;
+            recalculateFinancials();
+            renderActiveViewLayout();
+        }
+
+        async function executeAddClient(event) {
+            event.preventDefault();
+            if (!requireManager()) return;
+            const inputName = document.getElementById('newClientName').value.trim();
+            const inputPhone = document.getElementById('newClientPhone').value.trim();
+            const inputRoom = document.getElementById('newClientRoom').value.trim();
+            const inputRent = document.getElementById('newClientRent').value.trim();
+            const inputNotes = document.getElementById('newClientNotes').value.trim();
+            if (!inputName || !inputPhone || !inputRoom || !inputRent) return;
+
+            try {
+                const res = await api('/api/clients', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: inputName, phone: inputPhone, room: inputRoom,
+                        rent: Number(inputRent), notes: inputNotes
+                    })
+                });
+                if (!res || !res.ok) {
+                    const data = res ? await res.json().catch(() => ({})) : {};
+                    throw new Error(data.error || 'فشل الإضافة');
+                }
+                document.getElementById('addClientForm').reset();
+                await fetchClients();
+                navigateToPanel('all');
+            } catch (e) {
+                alert('تعذر إضافة العميل: ' + e.message);
+            }
+        }
+
+        function openEditModal(clientId) {
+            const client = masterClientsList.find(c => c.id === clientId);
+            if (!client) return;
+            document.getElementById('editClientId').value = client.id;
+            document.getElementById('editClientName').value = client.name;
+            document.getElementById('editClientPhone').value = client.phone;
+            document.getElementById('editClientRoom').value = client.room;
+            document.getElementById('editClientRent').value = client.rent;
+            document.getElementById('editClientNotes').value = client.notes || '';
+            document.getElementById('editModalOverlay').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModalOverlay').classList.add('hidden');
+        }
+
+        async function saveEditClient(event) {
+            event.preventDefault();
+            if (!requireManager()) return;
+            const clientId = document.getElementById('editClientId').value;
+
+            const inputName = document.getElementById('editClientName').value.trim();
+            const inputPhone = document.getElementById('editClientPhone').value.trim();
+            const inputRoom = document.getElementById('editClientRoom').value.trim();
+            const inputRent = document.getElementById('editClientRent').value.trim();
+            const inputNotes = document.getElementById('editClientNotes').value.trim();
+            if (!inputName || !inputPhone || !inputRoom || !inputRent) return;
+
+            try {
+                const res = await api(`/api/clients/${clientId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        name: inputName, phone: inputPhone, room: inputRoom,
+                        rent: Number(inputRent), notes: inputNotes
+                    })
+                });
+                if (!res || !res.ok) {
+                    const data = res ? await res.json().catch(() => ({})) : {};
+                    throw new Error(data.error || 'فشل الحفظ');
+                }
+                closeEditModal();
+                await fetchClients();
+            } catch (e) {
+                alert('تعذر حفظ التعديلات: ' + e.message);
+            }
+        }
+
+        function exportBackup() {
+            const backupPayload = {
+                exported_at: new Date().toISOString(),
+                source: 'إدارة أسطبل شيهان',
+                clients: masterClientsList
+            };
+            const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const dateStamp = new Date().toISOString().slice(0, 10);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `stable_backup_${dateStamp}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function importBackup(event) {
+            if (!requireManager()) { event.target.value = ''; return; }
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    const clientsArray = Array.isArray(parsed) ? parsed : parsed.clients;
+                    if (!Array.isArray(clientsArray)) {
+                        alert('ملف النسخة الاحتياطية غير صالح.');
+                        return;
+                    }
+                    const confirmMsg = `سيتم استبدال كافة بيانات العملاء الحالية (${masterClientsList.length}) بالبيانات الموجودة في النسخة الاحتياطية (${clientsArray.length} عميل). هل تريد المتابعة؟`;
+                    if (confirm(confirmMsg)) {
+                        const res = await api('/api/clients/import', {
+                            method: 'POST',
+                            body: JSON.stringify({ clients: clientsArray })
+                        });
+                        if (!res || !res.ok) {
+                            const data = res ? await res.json().catch(() => ({})) : {};
+                            throw new Error(data.error || 'فشل الاستيراد');
+                        }
+                        alert('تم استعادة النسخة الاحتياطية بنجاح.');
+                        await fetchClients();
+                    }
+                } catch (err) {
+                    alert('تعذر قراءة ملف النسخة الاحتياطية أو مزامنتها: ' + err.message);
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        async function executeDeleteClient(clientId) {
+            if (!requireManager()) return;
+            if (confirm('تحذير: هل أنت متأكد تماماً من حذف ملف هذا العميل بشكل نهائي؟ ستفقد كافة السجلات المالية المرتبطة به.')) {
+                try {
+                    const res = await api(`/api/clients/${clientId}`, { method: 'DELETE' });
+                    if (!res || !res.ok) {
+                        const data = res ? await res.json().catch(() => ({})) : {};
+                        throw new Error(data.error || 'فشل الحذف');
+                    }
+                    await fetchClients();
+                } catch (e) {
+                    alert('تعذر حذف العميل: ' + e.message);
+                }
+            }
+        }
+
+        const weekDaysAr = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+
+        function renderTodayDate() {
+            const now = new Date();
+            const dayName = weekDaysAr[now.getDay()];
+            const dayNum = now.getDate();
+            const monthCode = String(now.getMonth() + 1).padStart(2, '0');
+            const monthName = monthNamesAr[monthCode];
+            const year = now.getFullYear();
+            document.getElementById('todayWeekday').innerText = dayName;
+            document.getElementById('todayDateNum').innerText = `${dayNum} ${monthName} ${year}`;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderTodayDate();
+            initAuth();
+        });
+    </script>
+</body>
+</html>
