@@ -105,6 +105,18 @@
         .status-strip { display:flex; justify-content:space-between; align-items:center; padding:7px 10px; border-radius:9px; font-size:0.78rem; font-weight:700; margin-bottom:8px; border:1.5px dashed; }
         .status-strip.paid { background-color:var(--hunter-light); color:var(--hunter); border-color:var(--hunter); }
         .status-strip.unpaid { background-color:var(--oxblood-light); color:var(--oxblood); border-color:var(--oxblood); }
+        .status-strip .stamp { display:inline-flex; align-items:center; gap:6px; }
+
+        /* ── Compact expandable row (paid/pending views) ── */
+        .compact-row { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-radius:10px; margin-bottom:8px; cursor:pointer; font-weight:700; font-size:0.92rem; transition:var(--transition); gap:10px; }
+        .compact-row:active { transform:scale(0.98); }
+        .compact-row.paid-row { background:var(--hunter-light); color:var(--hunter); border:1.5px solid var(--hunter); }
+        .compact-row.unpaid-row { background:var(--oxblood-light); color:var(--oxblood); border:1.5px solid var(--oxblood); }
+        .compact-row .compact-left { display:flex; align-items:center; gap:10px; min-width:0; }
+        .compact-row .compact-left i { font-size:1.1rem; }
+        .compact-row .compact-name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .compact-row .compact-amount { white-space:nowrap; flex-shrink:0; }
+        .compact-details { margin-bottom:8px; margin-top:-4px; border-radius:0 0 10px 10px; }
         .action-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:6px; }
         .action-grid.two-col { grid-template-columns:1.4fr 1fr; }
         .options-wrapper { position:relative; }
@@ -190,11 +202,6 @@
         .modal-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px; }
         .modal-actions.three-col { grid-template-columns:1fr 1fr 1fr; }
 
-        /* ── Floating PDF button ── */
-        .fab-pdf { position:fixed; bottom:90px; left:calc(50% - 220px); width:48px; height:48px; border-radius:50%; background:var(--oxblood); color:white; border:none; font-size:1.2rem; cursor:pointer; z-index:900; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:var(--transition); }
-        .fab-pdf:active { transform:scale(0.92); }
-        @media (min-width:481px) { .fab-pdf { left:calc(50% - 220px); } }
-
         .hidden { display:none !important; }
         .empty-state { text-align:center; padding:46px 20px; color:var(--ink); opacity:0.5; }
         .empty-state i { font-size:2.8rem; color:var(--brass-light); margin-bottom:14px; display:block; }
@@ -274,58 +281,30 @@
             <button class="search-clear hidden" id="searchClear" onclick="clearSearch()"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- Financial Summary Toggle -->
-        <button class="btn btn-toggle-summary" id="toggleSummaryBtn" onclick="toggleSummary()">
-            <i class="fa-solid fa-chart-pie"></i> عرض الملخص المالي وتقارير الإدارة
-        </button>
-
-        <!-- Dashboard & Management (hidden by default) -->
-        <div id="summarySection" class="hidden">
-            <div class="dashboard-grid">
-                <div class="dash-card"><h3><i class="fa-solid fa-circle-check" style="color:var(--hunter)"></i> المدفوعات</h3><div class="value" id="statCollected">0 ر.ق</div><div class="sub-value" id="statCollectedCount" style="color:var(--hunter)">0 عملاء</div></div>
-                <div class="dash-card"><h3><i class="fa-solid fa-triangle-exclamation" style="color:var(--oxblood)"></i> المتأخرات</h3><div class="value" id="statPending">0 ر.ق</div><div class="sub-value" id="statPendingCount" style="color:var(--oxblood)">0 عملاء</div></div>
-                <div class="dash-card full-width"><h3><i class="fa-solid fa-coins" style="color:var(--brass)"></i> إجمالي السنة (YTD)</h3><div class="value" id="statYTD">0 ر.ق</div></div>
-            </div>
-
-            <!-- Backup & Restore -->
-            <div class="mgmt-card">
-                <h3><i class="fa-solid fa-database" style="color:var(--hunter)"></i> النسخ الاحتياطي</h3>
-                <div class="mgmt-desc">تنزيل أو استعادة نسخة احتياطية بصيغة JSON.</div>
-                <div class="mgmt-buttons-grid">
-                    <button class="btn btn-management" onclick="exportBackup()"><i class="fa-solid fa-download"></i> تنزيل</button>
-                    <button class="btn btn-pdf" onclick="document.getElementById('backupFileInput').click()"><i class="fa-solid fa-upload"></i> استعادة</button>
-                </div>
-                <input type="file" id="backupFileInput" accept="application/json" class="hidden" onchange="importBackup(event)">
-            </div>
-
-            <!-- Deleted Customers -->
-            <div class="mgmt-card" id="deletedCustomersCard">
-                <h3><i class="fa-solid fa-trash-arrow-up" style="color:var(--oxblood)"></i> العملاء المحذوفون</h3>
-                <div class="mgmt-desc">استعادة العملاء المحذوفين سابقاً إلى القائمة النشطة.</div>
-                <div id="deletedCustomersList"></div>
-            </div>
-        </div>
-
         <!-- ═══ VIEW: All Customers ═══ -->
         <div id="panel-all" class="view-panel">
             <div class="panel-title">جميع العملاء <span class="badge-count" id="count-all">0</span></div>
             <div id="container-all"></div>
         </div>
 
-        <!-- ═══ VIEW: Paid Customers ═══ -->
-        <div id="panel-paid" class="view-panel hidden">
-            <div class="panel-title">العملاء الملتزمين بالدفع <span class="badge-count" id="count-paid">0</span></div>
-            <div id="container-paid"></div>
-        </div>
-
-        <!-- ═══ VIEW: Pending Customers ═══ -->
-        <div id="panel-pending" class="view-panel hidden">
-            <div class="panel-title">المتأخرين عن السداد <span class="badge-count" id="count-pending">0</span></div>
-            <div id="container-pending"></div>
-        </div>
-
         <!-- ═══ VIEW: Revenue & Costs ═══ -->
         <div id="panel-finance" class="view-panel hidden">
+            <!-- Dashboard Stats — compact 1-line cards -->
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">
+                <div class="dash-card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:3px solid var(--hunter);">
+                    <span style="font-weight:700;color:var(--hunter);display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-circle-check"></i> Revenue</span>
+                    <span style="font-weight:800;font-size:1.1rem;"><span id="statCollected">0</span> ر.ق — <span id="statCollectedCount" style="color:var(--hunter);">0</span> عملاء</span>
+                </div>
+                <div class="dash-card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:3px solid var(--oxblood);">
+                    <span style="font-weight:700;color:var(--oxblood);display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-triangle-exclamation"></i> Pending</span>
+                    <span style="font-weight:800;font-size:1.1rem;"><span id="statPending">0</span> ر.ق — <span id="statPendingCount" style="color:var(--oxblood);">0</span> عملاء</span>
+                </div>
+                <div class="dash-card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:3px solid var(--brass);">
+                    <span style="font-weight:700;color:var(--leather);display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-coins"></i> YTD</span>
+                    <span style="font-weight:800;font-size:1.1rem;"><span id="statYTD">0</span> ر.ق</span>
+                </div>
+            </div>
+
             <div class="sub-tabs">
                 <button class="sub-tab active" id="subtab-revenue" onclick="switchFinanceTab('revenue')">الإيرادات</button>
                 <button class="sub-tab" id="subtab-costs" onclick="switchFinanceTab('costs')">التكاليف</button>
@@ -344,8 +323,8 @@
             <!-- Costs View -->
             <div id="finance-costs" class="hidden">
                 <div class="panel-title">تكاليف الشهر الحالي
-                    <button class="btn btn-submit" style="margin-top:0;padding:8px 14px;font-size:0.78rem;" onclick="openCostForm()">
-                        <i class="fa-solid fa-plus"></i> إضافة
+                    <button class="btn btn-edit" style="width:auto;padding:4px 10px;font-size:0.7rem;margin-top:0;" onclick="openCostForm()">
+                        <i class="fa-solid fa-plus"></i>
                     </button>
                 </div>
                 <div class="ledger-table">
@@ -354,6 +333,37 @@
                     <div class="ledger-summary"><span>الإجمالي</span><span id="costsTotal">0 ر.ق</span></div>
                 </div>
             </div>
+
+            <!-- Backup & Restore (collapsible) -->
+            <div class="mgmt-card" style="margin-top:18px;">
+                <h3 onclick="this.nextElementSibling.classList.toggle('hidden')" style="cursor:pointer;user-select:none;">
+                    <i class="fa-solid fa-database" style="color:var(--hunter)"></i> النسخ الاحتياطي
+                    <i class="fa-solid fa-chevron-down" style="margin-right:auto;font-size:0.7rem;opacity:0.5;"></i>
+                </h3>
+                <div class="hidden">
+                    <div class="mgmt-desc">تنزيل أو استعادة نسخة احتياطية بصيغة JSON.</div>
+                    <div class="mgmt-buttons-grid">
+                        <button class="btn btn-management" onclick="exportBackup()"><i class="fa-solid fa-download"></i> تنزيل</button>
+                        <button class="btn btn-pdf" onclick="document.getElementById('backupFileInput').click()"><i class="fa-solid fa-upload"></i> استعادة</button>
+                    </div>
+                    <input type="file" id="backupFileInput" accept="application/json" class="hidden" onchange="importBackup(event)">
+                </div>
+            </div>
+
+            <!-- Deleted Customers (collapsible) -->
+            <div class="mgmt-card" id="deletedCustomersCard">
+                <h3 onclick="this.nextElementSibling.classList.toggle('hidden')" style="cursor:pointer;user-select:none;">
+                    <i class="fa-solid fa-trash-arrow-up" style="color:var(--oxblood)"></i> العملاء المحذوفون
+                    <i class="fa-solid fa-chevron-down" style="margin-right:auto;font-size:0.7rem;opacity:0.5;"></i>
+                </h3>
+                <div class="hidden">
+                    <div class="mgmt-desc">استعادة العملاء المحذوفين سابقاً إلى القائمة النشطة.</div>
+                    <div id="deletedCustomersList"></div>
+                </div>
+            </div>
+
+            <!-- PDF Report button -->
+            <button class="btn btn-submit" style="margin-top:14px;" onclick="generatePDF()"><i class="fa-solid fa-file-pdf"></i> طباعة / حفظ PDF</button>
         </div>
 
         <!-- ═══ VIEW: Create Customer Form ═══ -->
@@ -388,16 +398,11 @@
     <!-- ═══ BOTTOM NAVIGATION ═══ -->
     <nav class="bottom-nav hidden" id="bottomNav">
         <button class="nav-item active" id="nav-all" onclick="navigatePanel('all')"><i class="fa-solid fa-list"></i> الكل</button>
-        <button class="nav-item" id="nav-paid" onclick="navigatePanel('paid')"><i class="fa-solid fa-circle-check"></i> الخالصين</button>
-        <button class="nav-item" id="nav-pending" onclick="navigatePanel('pending')"><i class="fa-solid fa-clock"></i> المتأخرين<span class="badge hidden" id="badgePending">0</span></button>
         <button class="nav-item" id="nav-finance" onclick="navigatePanel('finance')"><i class="fa-solid fa-chart-line"></i> المالية</button>
         <button class="nav-item" id="nav-add" onclick="navigatePanel('add')"><i class="fa-solid fa-plus-circle"></i> إضافة</button>
     </nav>
 
-    <!-- ═══ FLOATING PDF BUTTON ═══ -->
-    <button class="fab-pdf hidden" id="fabPDF" onclick="generatePDF()" title="طباعة / PDF"><i class="fa-solid fa-file-pdf"></i></button>
-
-    <!-- ═══ MODALS ═══ -->
+        <!-- ═══ MODALS ═══ -->
 
     <!-- Edit Customer Modal -->
     <div class="modal-overlay hidden" id="editModal">
@@ -507,6 +512,7 @@
             <h3><i class="fa-solid fa-money-bill"></i> تحديث حالة الدفع</h3>
             <form onsubmit="submitPayment(event)">
                 <input type="hidden" id="payCustomerId">
+                <input type="hidden" id="payOriginalDate">
                 <div class="form-group"><label>العميل</label><input type="text" id="payCustomerName" readonly></div>
                 <div class="form-row">
                     <div class="form-group"><label>التاريخ</label><input type="date" id="payDate" required></div>
@@ -560,7 +566,6 @@
             document.getElementById('roleStatusBar').classList.add('hidden');
             document.getElementById('searchBar').classList.add('hidden');
             document.getElementById('bottomNav').classList.add('hidden');
-            document.getElementById('fabPDF').classList.add('hidden');
             document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
         }
 
@@ -583,7 +588,6 @@
                 document.getElementById('roleStatusBar').classList.remove('hidden');
                 document.getElementById('searchBar').classList.remove('hidden');
                 document.getElementById('bottomNav').classList.remove('hidden');
-                document.getElementById('fabPDF').classList.remove('hidden');
                 updateRoleUI();
                 await loadAllData();
                 navigatePanel('all');
@@ -600,7 +604,6 @@
             document.getElementById('roleStatusBar').classList.remove('hidden');
             document.getElementById('searchBar').classList.remove('hidden');
             document.getElementById('bottomNav').classList.remove('hidden');
-            document.getElementById('fabPDF').classList.remove('hidden');
             updateRoleUI();
             await loadAllData();
             navigatePanel('all');
@@ -670,19 +673,12 @@
                 ytd += yrPayments.reduce((s, p) => s + parseInt(p.value || '0'), 0);
             });
 
-            document.getElementById('statCollected').innerText = `${paidAmt} ر.ق`;
-            document.getElementById('statCollectedCount').innerText = `${paidCnt} عملاء`;
-            document.getElementById('statPending').innerText = `${unpaidAmt} ر.ق`;
-            document.getElementById('statPendingCount').innerText = `${unpaidCnt} عملاء`;
-            document.getElementById('statYTD').innerText = `${ytd} ر.ق`;
-
-            const badge = document.getElementById('badgePending');
-            if (unpaidCnt > 0) { badge.innerText = unpaidCnt; badge.classList.remove('hidden'); }
-            else badge.classList.add('hidden');
-
+            document.getElementById('statCollected').innerText = paidAmt;
+            document.getElementById('statCollectedCount').innerText = paidCnt;
+            document.getElementById('statPending').innerText = unpaidAmt;
+            document.getElementById('statPendingCount').innerText = unpaidCnt;
+            document.getElementById('statYTD').innerText = ytd;
             document.getElementById('count-all').innerText = customers.length;
-            document.getElementById('count-paid').innerText = paidCnt;
-            document.getElementById('count-pending').innerText = unpaidCnt;
         }
 
         // ══════════════════════════════════════════════════════════════
@@ -706,14 +702,23 @@
         }
 
         function renderCurrentPanel() {
-            if (currentPanel === 'all') renderCustomerCards('container-all', filterSearch(sortByRoom(customers)));
-            else if (currentPanel === 'paid') renderCustomerCards('container-paid', filterSearch(customers.filter(isPaidThisMonth)));
-            else if (currentPanel === 'pending') renderCustomerCards('container-pending', filterSearch(customers.filter(c => !isPaidThisMonth(c))));
-            else if (currentPanel === 'finance') renderFinance();
-            else if (currentPanel === 'add') {} // static form
+            if (currentPanel === 'all') {
+                // Sort unpaid first, then by room
+                const sorted = [...customers].sort((a, b) => {
+                    const aPaid = isPaidThisMonth(a), bPaid = isPaidThisMonth(b);
+                    if (aPaid !== bPaid) return aPaid ? 1 : -1; // unpaid first
+                    const na = parseInt((a.rooms[0]||'').match(/\d+/)?.[0]||'0');
+                    const nb = parseInt((b.rooms[0]||'').match(/\d+/)?.[0]||'0');
+                    return na - nb;
+                });
+                renderCustomerCards('container-all', filterSearch(sorted), true);
+            } else if (currentPanel === 'finance') {
+                renderFinance();
+                renderDeletedCustomers();
+            }
         }
 
-        function renderCustomerCards(containerId, list) {
+        function renderCustomerCards(containerId, list, compact = false) {
             const el = document.getElementById(containerId);
             if (!el) return;
             el.innerHTML = '';
@@ -733,40 +738,92 @@
                 const unpaidMsg = `مرحباً ${c.name}، نود تذكيركم بأن إيجار الغرفة (${rooms}) لشهر ${monthText} بقيمة ${rent} ر.ق مستحق. يرجى التحويل.`;
                 const msg = encodeURIComponent(paid ? paidMsg : unpaidMsg);
 
-                const div = document.createElement('div');
-                div.className = 'client-card';
-                div.innerHTML = `
-                    <div class="client-row-main">
-                        <div class="name-room-row">
-                            <span class="meta-tag room">${rooms}</span>
-                            <h4>${c.name}</h4>
+                if (compact) {
+                    // ── Compact row (paid/pending views) ──
+                    const rowClass = paid ? 'paid-row' : 'unpaid-row';
+                    const icon = paid ? 'fa-circle-check' : 'fa-circle-exclamation';
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <div class="compact-row ${rowClass}" onclick="toggleCompactDetails('details-${c.id}')">
+                            <span class="compact-left"><i class="fa-solid ${icon}"></i> <span class="compact-name">${c.name}</span></span>
+                            <span class="compact-amount">${rent} ر.ق</span>
                         </div>
-                        <div class="price-badge"><div class="amt">${rent}</div><div class="lbl">ر.ق</div></div>
-                    </div>
-                    ${c.OtherMonthlyCost && c.OtherMonthlyCost.description ? `<div class="client-notes"><i class="fa-solid fa-note-sticky"></i>${c.OtherMonthlyCost.description}: ${c.OtherMonthlyCost.value} ر.ق</div>` : ''}
-                    <div class="status-strip ${paid?'paid':'unpaid'}">
-                        <span><i class="fa-solid ${paid?'fa-stamp':'fa-hourglass-half'}"></i> ${paid?'تم الدفع':'بانتظار الدفع'}</span>
-                        <span>${paid?'خالص':'مستحق'}</span>
-                    </div>
-                    <div class="action-grid two-col">
-                        <button class="btn ${paid?'btn-unpay-trigger':'btn-pay-trigger'}" onclick="quickTogglePayment('${c.id}')">
-                            ${paid?'↩️ إلغاء الدفع':'✔️ دافع'}
-                        </button>
-                        <div class="options-wrapper">
-                            <button class="btn btn-options" onclick="toggleMenu(this)" style="height:100%;">⋯</button>
-                            <div class="options-menu hidden" id="menu-${c.id}">
-                                <button class="options-menu-item" onclick="closeMenus();openDetailModal('${c.id}')"><i class="fa-solid fa-eye"></i> عرض التفاصيل</button>
-                                <button class="options-menu-item" onclick="closeMenus();openEditModal('${c.id}')"><i class="fa-solid fa-pen"></i> تعديل</button>
-                                <a class="options-menu-item" href="https://wa.me/${fullPhone}?text=${msg}" target="_blank" onclick="closeMenus()"><i class="fa-brands fa-whatsapp"></i> واتساب</a>
-                                <button class="options-menu-item" onclick="closeMenus();openPaymentModal('${c.id}')"><i class="fa-solid fa-money-bill"></i> تحديث الدفع</button>
-                                <button class="options-menu-item" onclick="closeMenus();openMessageModal('${c.id}')"><i class="fa-solid fa-message"></i> رسالة مخصصة</button>
-                                <button class="options-menu-item danger" onclick="closeMenus();deleteCustomer('${c.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
+                        <div class="compact-details hidden" id="details-${c.id}">
+                            <div class="client-card" style="border-radius:0 0 10px 10px;margin-bottom:0;margin-top:0;">
+                                <div class="client-row-main">
+                                    <div class="name-room-row">
+                                        <span class="meta-tag room">${rooms}</span>
+                                        <h4>${c.name}</h4>
+                                    </div>
+                                    <div class="price-badge"><div class="amt">${rent}</div><div class="lbl">ر.ق</div></div>
+                                </div>
+                                ${c.OtherMonthlyCost && c.OtherMonthlyCost.description ? `<div class="client-notes"><i class="fa-solid fa-note-sticky"></i>${c.OtherMonthlyCost.description}: ${c.OtherMonthlyCost.value} ر.ق</div>` : ''}
+                                <div class="status-strip ${paid?'paid':'unpaid'}">
+                                    <span><i class="fa-solid ${paid?'fa-stamp':'fa-hourglass-half'}"></i> ${paid?'تم الدفع':'بانتظار الدفع'}</span>
+                                    <span>${paid?'خالص':'مستحق'}</span>
+                                </div>
+                                <div class="action-grid two-col">
+                                    <button class="btn ${paid?'btn-unpay-trigger':'btn-pay-trigger'}" onclick="quickTogglePayment('${c.id}')">
+                                        ${paid?'↩️ إلغاء الدفع':'✔️ دافع'}
+                                    </button>
+                                    <div class="options-wrapper">
+                                        <button class="btn btn-options" onclick="toggleMenu(this)" style="height:100%;">⋯</button>
+                                        <div class="options-menu hidden" id="menu-${c.id}">
+                                            <button class="options-menu-item" onclick="closeMenus();openDetailModal('${c.id}')"><i class="fa-solid fa-eye"></i> عرض التفاصيل</button>
+                                            <button class="options-menu-item" onclick="closeMenus();openEditModal('${c.id}')"><i class="fa-solid fa-pen"></i> تعديل</button>
+                                            <a class="options-menu-item" href="https://wa.me/${fullPhone}?text=${msg}" target="_blank" onclick="closeMenus()"><i class="fa-brands fa-whatsapp"></i> واتساب</a>
+                                            <button class="options-menu-item" onclick="closeMenus();openPaymentModal('${c.id}')"><i class="fa-solid fa-money-bill"></i> تحديث الدفع</button>
+                                            <button class="options-menu-item" onclick="closeMenus();openMessageModal('${c.id}')"><i class="fa-solid fa-message"></i> رسالة مخصصة</button>
+                                            <button class="options-menu-item danger" onclick="closeMenus();deleteCustomer('${c.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-                el.appendChild(div);
+                    `;
+                    el.appendChild(div);
+                } else {
+                    // ── Full card (all view) ──
+                    const div = document.createElement('div');
+                    div.className = 'client-card';
+                    div.innerHTML = `
+                        <div class="client-row-main">
+                            <div class="name-room-row">
+                                <span class="meta-tag room">${rooms}</span>
+                                <h4>${c.name}</h4>
+                            </div>
+                            <div class="price-badge"><div class="amt">${rent}</div><div class="lbl">ر.ق</div></div>
+                        </div>
+                        ${c.OtherMonthlyCost && c.OtherMonthlyCost.description ? `<div class="client-notes"><i class="fa-solid fa-note-sticky"></i>${c.OtherMonthlyCost.description}: ${c.OtherMonthlyCost.value} ر.ق</div>` : ''}
+                        <div class="status-strip ${paid?'paid':'unpaid'}">
+                            <span><i class="fa-solid ${paid?'fa-stamp':'fa-hourglass-half'}"></i> ${paid?'تم الدفع':'بانتظار الدفع'}</span>
+                            <span>${paid?'خالص':'مستحق'}</span>
+                        </div>
+                        <div class="action-grid two-col">
+                            <button class="btn ${paid?'btn-unpay-trigger':'btn-pay-trigger'}" onclick="quickTogglePayment('${c.id}')">
+                                ${paid?'↩️ إلغاء الدفع':'✔️ دافع'}
+                            </button>
+                            <div class="options-wrapper">
+                                <button class="btn btn-options" onclick="toggleMenu(this)" style="height:100%;">⋯</button>
+                                <div class="options-menu hidden" id="menu-${c.id}">
+                                    <button class="options-menu-item" onclick="closeMenus();openDetailModal('${c.id}')"><i class="fa-solid fa-eye"></i> عرض التفاصيل</button>
+                                    <button class="options-menu-item" onclick="closeMenus();openEditModal('${c.id}')"><i class="fa-solid fa-pen"></i> تعديل</button>
+                                    <a class="options-menu-item" href="https://wa.me/${fullPhone}?text=${msg}" target="_blank" onclick="closeMenus()"><i class="fa-brands fa-whatsapp"></i> واتساب</a>
+                                    <button class="options-menu-item" onclick="closeMenus();openPaymentModal('${c.id}')"><i class="fa-solid fa-money-bill"></i> تحديث الدفع</button>
+                                    <button class="options-menu-item" onclick="closeMenus();openMessageModal('${c.id}')"><i class="fa-solid fa-message"></i> رسالة مخصصة</button>
+                                    <button class="options-menu-item danger" onclick="closeMenus();deleteCustomer('${c.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    el.appendChild(div);
+                }
             });
+        }
+
+        function toggleCompactDetails(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
         }
 
         function renderFinance() {
@@ -843,22 +900,8 @@
             document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
             const panelEl = document.getElementById(`panel-${panel}`);
             if (panelEl) panelEl.classList.remove('hidden');
+            if (panel === 'finance') loadAllData();
             renderCurrentPanel();
-        }
-
-        function toggleSummary() {
-            const sec = document.getElementById('summarySection');
-            const btn = document.getElementById('toggleSummaryBtn');
-            if (sec.classList.contains('hidden')) {
-                sec.classList.remove('hidden');
-                btn.classList.add('open');
-                btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i> إخفاء الملخص المالي';
-                loadAllData();
-            } else {
-                sec.classList.add('hidden');
-                btn.classList.remove('open');
-                btn.innerHTML = '<i class="fa-solid fa-chart-pie"></i> عرض الملخص المالي وتقارير الإدارة';
-            }
         }
 
         function handleSearch() {
@@ -981,6 +1024,7 @@
             const c = customers.find(x => x.id === id); if (!c) return;
             document.getElementById('payCustomerId').value = c.id;
             document.getElementById('payCustomerName').value = c.name;
+            document.getElementById('payOriginalDate').value = '';
             document.getElementById('payDate').value = getPeriod() + '-01';
             document.getElementById('payValue').value = c.FixedMonthlyRent || '0';
             const period = getPeriod();
@@ -994,8 +1038,16 @@
             const id = document.getElementById('payCustomerId').value;
             const date = document.getElementById('payDate').value;
             const value = document.getElementById('payValue').value;
+            const originalDate = document.getElementById('payOriginalDate').value;
+
+            // If editing and date changed, delete old entry first
+            if (originalDate && originalDate !== date) {
+                await api(`/api/customers/${id}/payment`, { method:'DELETE', body:JSON.stringify({date: originalDate}) });
+            }
+            // Toggle (adds if not exists, removes if exists for this date)
             const res = await api(`/api/customers/${id}/payment`, { method:'PUT', body:JSON.stringify({date, value}) });
             if (!res || !res.ok) { alert('فشل'); return; }
+            document.getElementById('payOriginalDate').value = '';
             closeModal('paymentModal');
             await loadAllData();
         }
@@ -1014,6 +1066,27 @@
             const id = currentDetailId;
             closeModal('detailModal');
             openPaymentModal(id);
+        }
+
+        function editInvoiceEntry(customerId, index, date, value) {
+            closeModal('detailModal');
+            const c = customers.find(x => x.id === customerId); if (!c) return;
+            document.getElementById('payCustomerId').value = customerId;
+            document.getElementById('payCustomerName').value = c.name;
+            document.getElementById('payOriginalDate').value = date;
+            document.getElementById('payDate').value = date;
+            document.getElementById('payValue').value = value;
+            document.getElementById('btnUndoPayment').classList.remove('hidden');
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        async function deleteInvoiceEntry(customerId, date) {
+            if (!confirm(`حذف دفعة ${date} من السجل؟`)) return;
+            const res = await api(`/api/customers/${customerId}/payment`, { method:'DELETE', body:JSON.stringify({date}) });
+            if (!res || !res.ok) { alert('فشل الحذف'); return; }
+            await loadAllData();
+            // Re-open detail modal
+            openDetailModal(customerId);
         }
 
         // ══════════════════════════════════════════════════════════════
@@ -1074,7 +1147,14 @@
             const ph = c.paymentHistory || [];
             document.getElementById('invoiceHistory').innerHTML = ph.length === 0
                 ? '<div style="opacity:0.5;text-align:center;padding:10px;">لا توجد مدفوعات مسجلة</div>'
-                : ph.map(p => `<div class="invoice-row"><span>${p.date}</span><span>${p.value} ر.ق</span></div>`).join('');
+                : ph.map((p, i) => `<div class="invoice-row">
+                    <span>${p.date}</span>
+                    <span style="display:flex;align-items:center;gap:6px;">
+                        ${p.value} ر.ق
+                        <button class="btn btn-edit" style="width:auto;padding:2px 6px;font-size:0.6rem;" onclick="editInvoiceEntry('${c.id}',${i},'${p.date}','${p.value}')" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-delete" style="width:auto;padding:2px 6px;font-size:0.6rem;" onclick="deleteInvoiceEntry('${c.id}','${p.date}')" title="حذف"><i class="fa-solid fa-xmark"></i></button>
+                    </span>
+                </div>`).join('');
             document.getElementById('invoiceTotal').innerText = ph.reduce((s, p) => s + parseInt(p.value || '0'), 0);
 
             // WhatsApp button

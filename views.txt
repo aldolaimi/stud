@@ -1,0 +1,10 @@
+revise the financial summary view into the following segments:
+1- The current year and month: the financial sumary should be presented for the selected year and month. Once 
+the selected year or month changes, the script should retrieve the financial data for that period and update the view immediately.
+
+2- The paid customers card: this card should display the monthly revenue in 1 line i the manner as follows, "Revenue" , the actual value of revenue for that month and the number of paid customers for that month.
+3- The unpaid customers card: It should display ina  similary manner as the paid customers card but displays the data from the unpaid list. make both paid and unpaid summaries vertically aligned.
+4- The backup and restore card should be in a collapsed state unless clicked. If clicked, it should expand and reveal the options available.
+5- The deletedCustomers card should be in a collapsed state.
+6- Remove the PDF icon that appears on every page and make it an option the financial summary view at the bottom.
+7- In the cost view card: make the button that opens openCostForm() occupay less space to make sure the title next to it is displayed in 1 line.

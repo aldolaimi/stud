@@ -443,7 +443,7 @@ async function handleAPI(req: Request): Promise<Response> {
 
   // ── PUT /api/customers/:id/payment ─────────────────────────────
   const paymentMatch = path.match(/^\/api\/customers\/([^/]+)\/payment$/);
-  if (paymentMatch && method === "PUT") {
+  if (paymentMatch && (method === "PUT" || method === "DELETE")) {
     const session = requireOperator(req);
     if (!session) return errorResponse("هذا الإجراء متاح للمشغلين فقط", 403);
     const op = getOperator(session);
@@ -451,34 +451,36 @@ async function handleAPI(req: Request): Promise<Response> {
     const customerId = paymentMatch[1];
 
     try {
-      const { date, value } = await req.json();
+      const body = method === "DELETE" ? await req.json() : await req.json();
+      const { date, value } = body;
       const customer = op.customers.find(c => c.id === customerId);
       if (!customer) return errorResponse("العميل غير موجود", 404);
 
       const paymentDate = date || new Date().toISOString().slice(0, 10);
       const paymentValue = String(value || customer.duePaymentCurrentMonth || customer.FixedMonthlyRent || "0");
 
-      // Check if already paid for this date
-      const existingIdx = customer.paymentHistory.findIndex(p => p.date === paymentDate);
-      if (existingIdx > -1) {
-        // Remove payment (undo)
-        customer.paymentHistory.splice(existingIdx, 1);
-        // Also remove from revenueAccount
-        const revIdx = op.revenueAccount.findIndex(
-          r => r.customer_id === customerId && r.date === paymentDate
-        );
-        if (revIdx > -1) op.revenueAccount.splice(revIdx, 1);
-        audit(op.id, op.name, "UNPAID", `${customer.name} — ${paymentDate}`);
+      if (method === "DELETE") {
+        // Force-remove a specific payment entry
+        const idx = customer.paymentHistory.findIndex(p => p.date === paymentDate);
+        if (idx > -1) {
+          customer.paymentHistory.splice(idx, 1);
+          const revIdx = op.revenueAccount.findIndex(r => r.customer_id === customerId && r.date === paymentDate);
+          if (revIdx > -1) op.revenueAccount.splice(revIdx, 1);
+          audit(op.id, op.name, "DELETE_PAYMENT", `${customer.name} — ${paymentDate}`);
+        }
       } else {
-        // Add payment
-        customer.paymentHistory.push({ date: paymentDate, value: paymentValue });
-        // Add to revenueAccount
-        op.revenueAccount.push({
-          customer_id: customerId,
-          payment: paymentValue,
-          date: paymentDate,
-        });
-        audit(op.id, op.name, "PAID", `${customer.name} — ${paymentDate} (${paymentValue})`);
+        // PUT — toggle
+        const existingIdx = customer.paymentHistory.findIndex(p => p.date === paymentDate);
+        if (existingIdx > -1) {
+          customer.paymentHistory.splice(existingIdx, 1);
+          const revIdx = op.revenueAccount.findIndex(r => r.customer_id === customerId && r.date === paymentDate);
+          if (revIdx > -1) op.revenueAccount.splice(revIdx, 1);
+          audit(op.id, op.name, "UNPAID", `${customer.name} — ${paymentDate}`);
+        } else {
+          customer.paymentHistory.push({ date: paymentDate, value: paymentValue });
+          op.revenueAccount.push({ customer_id: customerId, payment: paymentValue, date: paymentDate });
+          audit(op.id, op.name, "PAID", `${customer.name} — ${paymentDate} (${paymentValue})`);
+        }
       }
 
       await saveStore();
